@@ -2,15 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motor Speed Control</title>
+    <title>ESP32 Status</title>
+    <style>
+        .circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: red;
+            margin: 100px auto;
+        }
+    </style>
 </head>
 <body>
-    <h1>Motor Speed Control</h1>
-    <input type="range" id="motorSlider" min="-80" max="80" value="0">
-    <p>Motor Speed: <span id="motorSpeedValue">0</span></p>
+    <div class="circle" id="statusCircle"></div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        function updateCircle() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    const circle = document.getElementById('statusCircle');
+                    circle.style.backgroundColor = data.status;
+                });
+        }
+
+        // Check status every second
+        setInterval(updateCircle, 1000);
+        
+        // Initial check
+        updateCircle();
+    </script>
 </body>
 </html>
