@@ -2,35 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ESP32 Status</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circle Page</title>
     <style>
         .circle {
-            width: 100px;
-            height: 100px;
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
             background-color: red;
-            margin: 100px auto;
+            margin: 20px auto;
+            display: block;
         }
     </style>
 </head>
 <body>
     <div class="circle" id="statusCircle"></div>
+    <button id="toggleButton">Toggle Green</button>
 
-    <script>
-        function updateCircle() {
-            fetch('/status')
-                .then(response => response.json())
-                .then(data => {
-                    const circle = document.getElementById('statusCircle');
-                    circle.style.backgroundColor = data.status;
-                });
-        }
-
-        // Check status every second
-        setInterval(updateCircle, 1000);
-        
-        // Initial check
-        updateCircle();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
+
