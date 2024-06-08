@@ -9,17 +9,19 @@ document.getElementById('toggleButton').addEventListener('click', function() {
     }, 10000); // 10 seconds
 });
 
-function updateCircle() {
+function updateCircles() {
     fetch('/status')
         .then(response => response.json())
         .then(data => {
-            const circle = document.getElementById('statusCircle');
-            circle.style.backgroundColor = data.status === 'green' ? 'green' : 'red';
+            const statusCircle = document.getElementById('statusCircle');
+            const ultrasonicCircle = document.getElementById('ultrasonicCircle');
+            statusCircle.style.backgroundColor = data.button_status === 'green' ? 'green' : 'red';
+            ultrasonicCircle.style.backgroundColor = data.ultrasonic_status === 'green' ? 'green' : 'red';
         });
 }
 
 // Check status every second
-setInterval(updateCircle, 1000);
+setInterval(updateCircles, 1000);
 
 // Initial check
-updateCircle();
+updateCircles();
