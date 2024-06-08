@@ -5,19 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Circle Page</title>
     <style>
+        .circle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px; /* מרווח בין העיגולים */
+            margin: 20px;
+        }
         .circle {
             width: 150px;
             height: 150px;
             border-radius: 50%;
             background-color: red;
-            margin: 20px auto;
-            display: block;
         }
     </style>
 </head>
 <body>
-    <div class="circle" id="statusCircle"></div>
-    <div class="circle" id="ultrasonicCircle"></div>
+    <div class="circle-container">
+        <div class="circle" id="statusCircle"></div>
+        <div class="circle" id="ultrasonicCircle"></div>
+    </div>
     <button id="toggleButton">Toggle Green</button>
 
     <script src="script.js"></script>
