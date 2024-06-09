@@ -3,30 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Circle Page</title>
+    <title>Sensor Data</title>
     <style>
-        .circle-container {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            gap: 20px; /* מרווח בין העיגולים */
-            margin: 20px;
-        }
-        .circle {
-            width: 150px;
-            height: 150px;
+        .status {
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
+            display: inline-block;
+            margin: 10px;
+        }
+        #magnet {
+            background-color: red;
+        }
+        #ultrasonic {
             background-color: red;
         }
     </style>
 </head>
 <body>
-    <div class="circle-container">
-        <div class="circle" id="statusCircle"></div>
-        <div class="circle" id="ultrasonicCircle"></div>
+    <div>
+        <h3>Magnet Sensor:</h3>
+        <div id="magnet" class="status"></div>
     </div>
-    <button id="toggleButton">Toggle Green</button>
+    <div>
+        <h3>Ultrasonic Sensor:</h3>
+        <div id="ultrasonic" class="status"></div>
+    </div>
 
-    <script src="script.js"></script>
+    <script>
+        const magnetEventSource = new EventSource('/magnet_events');
+        magnetEventSource.onmessage = function(event) {
+            const magnetStatus = document.getElementById('magnet');
+            if (event.data === 'detected') {
+                magnetStatus.style.backgroundColor = 'green';
+            } else {
+                magnetStatus.style.backgroundColor = 'red';
+            }
+        };
+
+        const ultrasonicEventSource = new EventSource('/ultrasonic_events');
+        ultrasonicEventSource.onmessage = function(event) {
+            const ultrasonicStatus = document.getElementById('ultrasonic');
+            if (parseInt(event.data) < 25) {
+                ultrasonicStatus.style.backgroundColor = 'green';
+            } else {
+                ultrasonicStatus.style.backgroundColor = 'red';
+            }
+        };
+    </script>
 </body>
 </html>
