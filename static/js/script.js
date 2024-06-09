@@ -1,27 +1,32 @@
-document.getElementById('toggleButton').addEventListener('click', function() {
-    fetch('/update', { method: 'POST' });
+// קוד לחיישן מגנט
+function handleMagnetSensorEvent(event) {
+    const magnetStatus = event.data;
 
-    var circle = document.getElementById('statusCircle');
-    circle.style.backgroundColor = 'green';
-
-    setTimeout(function() {
-        circle.style.backgroundColor = 'red';
-    }, 10000); // 10 seconds
-});
-
-function updateCircles() {
-    fetch('/status')
-        .then(response => response.json())
-        .then(data => {
-            const statusCircle = document.getElementById('statusCircle');
-            const ultrasonicCircle = document.getElementById('ultrasonicCircle');
-            statusCircle.style.backgroundColor = data.button_status === 'green' ? 'green' : 'red';
-            ultrasonicCircle.style.backgroundColor = data.ultrasonic_status === 'green' ? 'green' : 'red';
-        });
+    if (magnetStatus === 'detected') {
+        document.getElementById('magnetSensorStatus').style.color = 'green';
+        document.getElementById('magnetSensorStatus').innerText = 'מגנט זוהה';
+    } else {
+        document.getElementById('magnetSensorStatus').style.color = 'black';
+        document.getElementById('magnetSensorStatus').innerText = 'לא זוהה מגנט';
+    }
 }
 
-// Check status every second
-setInterval(updateCircles, 1000);
+// קוד לחיישן אולטרהסוניק
+function handleUltrasonicSensorEvent(event) {
+    const distance = event.data;
 
-// Initial check
-updateCircles();
+    if (distance < 25) {
+        document.getElementById('ultrasonicSensorStatus').style.color = 'green';
+        document.getElementById('ultrasonicSensorStatus').innerText = 'מצטבר במרחק קרוב מדי';
+    } else {
+        document.getElementById('ultrasonicSensorStatus').style.color = 'black';
+        document.getElementById('ultrasonicSensorStatus').innerText = 'אין מצטבר במרחק קרוב';
+    }
+}
+
+// ספריה לתקשורת בין ESP לדפדפן
+const eventSource = new EventSource('/events');
+
+// לקרוא תגובות מהשרת עבור כל חיישן
+eventSource.addEventListener('magnetSensor', handleMagnetSensorEvent);
+eventSource.addEventListener('ultrasonicSensor', handleUltrasonicSensorEvent);
