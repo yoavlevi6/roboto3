@@ -1,39 +1,34 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, Response, send_from_directory
 import time
+import os
 
 app = Flask(__name__)
-last_button_update_time = 0
-ultrasonic_status = 'red'
+
+# פונקציה זו מפיקה אירועים לחיישן מגנט
+def magnet_sensor_events():
+    while True:
+        magnet_detected = True if time.time() % 5 < 2 else False
+        yield f"data: {'detected' if magnet_detected else 'not detected'}\n\n"
+        time.sleep(1)
+
+# פונקציה זו מפיקה אירועים לחיישן אולטרהסוניק
+def ultrasonic_sensor_events():
+    while True:
+        distance = 20 if time.time() % 7 < 2 else 30
+        yield f"data: {distance}\n\n"
+        time.sleep(1)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return send_from_directory(os.getcwd(), 'index.html')
 
-@app.route('/status', methods=['GET'])
-def status():
-    global last_button_update_time
-    current_time = time.time()
-    button_status = 'green' if current_time - last_button_update_time < 10 else 'red'
-    return jsonify(button_status=button_status, ultrasonic_status=ultrasonic_status)
+@app.route('/magnet_events', methods=['GET'])
+def magnet_events():
+    return Response(magnet_sensor_events(), content_type='text/event-stream')
 
-@app.route('/update', methods=['POST'])
-def update():
-    global last_button_update_time
-    last_button_update_time = time.time()
-    return '', 204
-
-@app.route('/update_ultrasonic', methods=['POST'])
-def update_ultrasonic():
-    global ultrasonic_status
-    distance = request.json.get('distance', 100)  # Default distance if not provided
-    if 25 <= distance <= 50:
-        ultrasonic_status = 'green'
-    else:
-        ultrasonic_status = 'red'
-    return '', 204
+@app.route('/ultrasonic_events', methods=['GET'])
+def ultrasonic_events():
+    return Response(ultrasonic_sensor_events(), content_type='text/event-stream')
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True)
