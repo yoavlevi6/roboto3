@@ -1,0 +1,41 @@
+#include <WiFi.h>
+#include <HTTPClient.h>
+
+const char* ssid = "hadarim-school";
+const char* password = "had441006";
+const char* serverUrl = "http://yoavlevi.pythonanywhere.com/update";
+const int magnetSensorPin = 15; // Change to the pin number connected to your magnet sensor
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(magnetSensorPin, INPUT_PULLUP); // Set the magnet sensor pin as input with pull-up resistor
+
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi...");
+  }
+  Serial.println("Connected to WiFi");
+}
+
+void loop() {
+  // Check if the magnet sensor is activated (i.e., magnet is near the sensor)
+  if (digitalRead(magnetSensorPin) == LOW) { // Assuming LOW means the magnet is near the sensor
+    if (WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      http.begin(serverUrl);
+      int httpResponseCode = http.POST("{}");
+      if (httpResponseCode > 0) {
+        Serial.println("Status updated successfully");
+      } else {
+        Serial.print("Error updating status: ");
+        Serial.println(httpResponseCode);
+      }
+      http.end();
+    }
+
+    // Debounce delay to prevent multiple triggers from one magnet activation
+    delay(500);
+  }
+}
