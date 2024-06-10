@@ -7,8 +7,8 @@ function updateCircle() {
         });
 }
 
-// Check status every second
+// בדיקת הסטטוס כל שנייה
 setInterval(updateCircle, 1000);
 
-// Initial check
+// בדיקה ראשונית
 updateCircle();
