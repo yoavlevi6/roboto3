@@ -22,7 +22,7 @@
                 .then(response => response.json())
                 .then(data => {
                     const circle = document.getElementById('statusCircle');
-                    circle.style.backgroundColor = data.status;
+                    circle.style.backgroundColor = data.status === 'green' ? 'green' : 'red';
                 });
         }
 
