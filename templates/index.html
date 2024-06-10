@@ -2,54 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensor Data</title>
+    <title>ESP32 Status</title>
     <style>
-        .status {
-            width: 50px;
-            height: 50px;
+        .circle {
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            display: inline-block;
-            margin: 10px;
-        }
-        #magnet {
             background-color: red;
-        }
-        #ultrasonic {
-            background-color: red;
+            margin: 100px auto;
         }
     </style>
 </head>
 <body>
-    <div>
-        <h3>Magnet Sensor:</h3>
-        <div id="magnet" class="status"></div>
-    </div>
-    <div>
-        <h3>Ultrasonic Sensor:</h3>
-        <div id="ultrasonic" class="status"></div>
-    </div>
+    <div class="circle" id="statusCircle"></div>
 
     <script>
-        const magnetEventSource = new EventSource('/magnet_events');
-        magnetEventSource.onmessage = function(event) {
-            const magnetStatus = document.getElementById('magnet');
-            if (event.data === 'detected') {
-                magnetStatus.style.backgroundColor = 'green';
-            } else {
-                magnetStatus.style.backgroundColor = 'red';
-            }
-        };
+        function updateCircle() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    const circle = document.getElementById('statusCircle');
+                    circle.style.backgroundColor = data.status;
+                });
+        }
 
-        const ultrasonicEventSource = new EventSource('/ultrasonic_events');
-        ultrasonicEventSource.onmessage = function(event) {
-            const ultrasonicStatus = document.getElementById('ultrasonic');
-            if (parseInt(event.data) < 25) {
-                ultrasonicStatus.style.backgroundColor = 'green';
-            } else {
-                ultrasonicStatus.style.backgroundColor = 'red';
-            }
-        };
+        // Check status every second
+        setInterval(updateCircle, 1000);
+        
+        // Initial check
+        updateCircle();
     </script>
 </body>
 </html>
