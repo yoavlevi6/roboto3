@@ -1,32 +1,14 @@
-// קוד לחיישן מגנט
-function handleMagnetSensorEvent(event) {
-    const magnetStatus = event.data;
-
-    if (magnetStatus === 'detected') {
-        document.getElementById('magnetSensorStatus').style.color = 'green';
-        document.getElementById('magnetSensorStatus').innerText = 'מגנט זוהה';
-    } else {
-        document.getElementById('magnetSensorStatus').style.color = 'black';
-        document.getElementById('magnetSensorStatus').innerText = 'לא זוהה מגנט';
-    }
+function updateCircle() {
+    fetch('/status')
+        .then(response => response.json())
+        .then(data => {
+            const circle = document.getElementById('statusCircle');
+            circle.style.backgroundColor = data.status;
+        });
 }
 
-// קוד לחיישן אולטרהסוניק
-function handleUltrasonicSensorEvent(event) {
-    const distance = event.data;
+// Check status every second
+setInterval(updateCircle, 1000);
 
-    if (distance < 25) {
-        document.getElementById('ultrasonicSensorStatus').style.color = 'green';
-        document.getElementById('ultrasonicSensorStatus').innerText = 'מצטבר במרחק קרוב מדי';
-    } else {
-        document.getElementById('ultrasonicSensorStatus').style.color = 'black';
-        document.getElementById('ultrasonicSensorStatus').innerText = 'אין מצטבר במרחק קרוב';
-    }
-}
-
-// ספריה לתקשורת בין ESP לדפדפן
-const eventSource = new EventSource('/events');
-
-// לקרוא תגובות מהשרת עבור כל חיישן
-eventSource.addEventListener('magnetSensor', handleMagnetSensorEvent);
-eventSource.addEventListener('ultrasonicSensor', handleUltrasonicSensorEvent);
+// Initial check
+updateCircle();
