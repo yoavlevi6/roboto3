@@ -1,28 +1,34 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, Response, request, send_from_directory
 import time
+import os
 
 app = Flask(__name__)
 
-# משתנה לאחסון הזמן של העדכון האחרון
-last_update_time = 0
+ultrasonic_status = 100  # initialize with a value greater than 25
+
+def ultrasonic_sensor_events():
+    while True:
+        yield f"data: {ultrasonic_status}\n\n"
+        time.sleep(1)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return send_from_directory(os.getcwd(), 'index.html')
 
-@app.route('/update', methods=['POST'])
-def update():
-    global last_update_time
-    last_update_time = time.time()
-    return jsonify(success=True)
+@app.route('/script.js')
+def script():
+    return send_from_directory(os.getcwd(), 'script.js')
 
-@app.route('/status', methods=['GET'])
-def status():
-    global last_update_time
-    current_time = time.time()
-    if current_time - last_update_time < 10:
-        return jsonify(status='green')
-    return jsonify(status='red')
+@app.route('/ultrasonic_events', methods=['GET'])
+def ultrasonic_events():
+    return Response(ultrasonic_sensor_events(), content_type='text/event-stream')
+
+@app.route('/update_ultrasonic_status', methods=['GET'])
+def update_ultrasonic_status():
+    global ultrasonic_status
+    ultrasonic_status = request.args.get('status')
+    print(f"Received status: {ultrasonic_status}")  # הוסף את השורה הזו לאבחון
+    return "Status received", 200
 
 if __name__ == '__main__':
     app.run(debug=True)
